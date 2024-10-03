@@ -3,6 +3,8 @@ function addUserInformation() {
     let basePath = '';
     if (window.location.pathname.includes('/Projects/')) {
         basePath = '../../Config/userinformation.txt';
+    } else if (window.location.pathname.includes('/PersonalProjects/')) {
+        basePath = '../../Config/userinformation.txt';
     } else if (window.location.pathname.includes('/HTML/')) {
         basePath = '../Config/userinformation.txt';
     } else {

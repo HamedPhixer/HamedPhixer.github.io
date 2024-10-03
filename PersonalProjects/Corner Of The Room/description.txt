@@ -1,0 +1,9 @@
+Corner Of The Room
+---
+This was my first 3D project, where I created all the assets for a student game which small wooden characters fight in a small room. I later developed it into a personal project to practice lighting and design, focusing on a diorama with a nostalgic 90s vibe.
+---
+Blender, UE5, Substance Painter
+---
+https://i.postimg.cc/3R10pYPR/Redner-Day-02.png
+---
+corneroftheroom.html
