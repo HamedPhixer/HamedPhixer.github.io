@@ -72,41 +72,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const mediaContainer = document.getElementById('project-media');
             const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
     
-            const basePath = window.location.pathname.split('/').slice(0, -1).join('/') + '/';
             const fragment = document.createDocumentFragment();
-    
             let i = 0;
+    
             while (i < lines.length) {
+                let urls = [];
                 let description = '';
-                let urls = [lines[i]];
     
-                // Check if the next line is a description
-                if (i + 1 < lines.length && !lines[i + 1].match(/\.(jpeg|jpg|gif|png|mp4|webm|mview)$/) && !lines[i + 1].includes('youtube.com') && !lines[i + 1].includes('sketchfab.com') && !lines[i + 1].includes(' // ') && !lines[i + 1].includes('||')) {
-                    description = lines[i + 1];
-                    i += 1;
-                }
-    
-                // Check if the line contains images for a comparison slider (using `//`)
+                // Determine if the line is a comparison slider (//), side-by-side row (||), or single media item
                 if (lines[i].includes(' // ')) {
                     urls = lines[i].split(' // ').map(url => url.trim());
+                    // Handle description for `//` case
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
+                    }
                     const mediaElement = createComparisonSliderElement(urls, description);
                     if (mediaElement) fragment.appendChild(mediaElement);
-                }
-                // Check if the line contains multiple images in a row (using `||`)
-                else if (lines[i].includes('||')) {
+    
+                } else if (lines[i].includes('||')) {
                     urls = lines[i].split('||').map(url => url.trim());
+                    // Handle description for `||` case
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
+                    }
                     const mediaElement = createImageRowElement(urls, description);
                     if (mediaElement) fragment.appendChild(mediaElement);
-                } 
-                else {
-                    // Adjust URLs for relative paths
-                    urls = urls.map(url => (url.startsWith('http') ? url : basePath + url));
     
-                    if (description.includes('(marmoset viewer)')) {
-                        urls = [`${urls[0]}.mview`];
+                } else {
+                    // Single media case
+                    urls = [lines[i].trim()];
+                    // Handle description for a single URL
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
                     }
-    
-                    // Create media elements for single images, videos, YouTube, Sketchfab, etc.
                     const mediaElement = createMediaElement(urls, description);
                     if (mediaElement) fragment.appendChild(mediaElement);
                 }
@@ -163,7 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return mediaElement;
     };
 
-    const createImageRowElement = (urls) => {
+    const createImageRowElement = (urls, description) => {
+        const container = document.createElement('div'); // New container for row and description
+        container.className = 'media-item';
+    
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item image-row';
     
@@ -179,8 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaElement.appendChild(imgElement);
         });
     
-        return mediaElement;
-    };
+        container.appendChild(mediaElement);
+    
+        if (description) {
+            const descElement = document.createElement('p');
+            descElement.className = 'media-description';
+            descElement.textContent = description;
+            container.appendChild(descElement); // Add description below the row
+        }
+    
+        return container;
+    };    
+    
     
     const createSingleImageElement = (url) => {
         const mediaElement = document.createElement('div');
@@ -194,33 +208,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return mediaElement;
     };
     
-        // Function to create a comparison slider element
-    const createComparisonSliderElement = (urls) => {
-        const mediaElement = document.createElement('div');
-        mediaElement.className = 'media-item';
-
+    // Function to create a comparison slider element
+    const createComparisonSliderElement = (urls, description) => {
+        const container = document.createElement('div'); // New container for slider and description
+        container.className = 'media-item';
+    
         const imgContainer = document.createElement('div');
         imgContainer.className = 'img-container';
-
+    
         const imgElement1 = document.createElement('img');
         imgElement1.src = urls[0];
         imgElement1.className = 'image-1';
         imgElement1.alt = 'Primary image';
         imgContainer.appendChild(imgElement1);
-
+    
         if (urls[1]) {
             const imgElement2 = document.createElement('img');
             imgElement2.src = urls[1];
             imgElement2.className = 'image-2';
             imgElement2.alt = 'Secondary image';
             imgContainer.appendChild(imgElement2);
-
+    
             const sliderContainer = document.createElement('div');
             sliderContainer.className = 'slider-container';
-
+    
             const sliderLine = document.createElement('div');
             sliderLine.className = 'slider-line';
-
+    
             const slider = document.createElement('input');
             slider.type = 'range';
             slider.min = '0';
@@ -233,18 +247,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgElement2.style.clipPath = `inset(0 0 0 ${value}%)`;
                 sliderLine.style.left = `calc(${value}% - 1px)`; // Ensure the line is aligned with the thumb
             });
-
+    
             sliderContainer.appendChild(sliderLine);
             sliderContainer.appendChild(slider);
-
-            mediaElement.appendChild(imgContainer);
-            mediaElement.appendChild(sliderContainer);
+    
+            container.appendChild(imgContainer);
+            container.appendChild(sliderContainer);
         } else {
-            mediaElement.appendChild(imgContainer);
+            container.appendChild(imgContainer);
         }
-
-        return mediaElement;
+    
+        // Add description below the slider, if provided
+        if (description) {
+            const descElement = document.createElement('p');
+            descElement.className = 'media-description';
+            descElement.textContent = description;
+            container.appendChild(descElement); // Add description below the slider
+        }
+    
+        return container;
     };
+    
 
     const createVideoElement = (url) => {
         const mediaElement = document.createElement('div');
