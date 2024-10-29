@@ -1,6 +1,6 @@
 Stylized Cassette Player
 ---
-Project Description
+Animated and rigged stylized music cassette player from my sketch.
 ---
 Blender, Zbrush, Substance Painter
 ---
