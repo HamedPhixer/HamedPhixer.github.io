@@ -4,6 +4,6 @@ Animated and rigged stylized music cassette player from my sketch.
 ---
 Blender, Zbrush, Substance Painter
 ---
-
+https://i.postimg.cc/tTMRX0sn/Stylized-Cassette-Player-Thumbnail01.jpg
 ---
 stylizedcassetteplayer.html
