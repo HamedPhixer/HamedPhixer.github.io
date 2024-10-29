@@ -1,9 +1,0 @@
-Stylized Cassette Player
----
-Project Description
----
-Blender, Zbrush, Substance Painter
----
-thumbnail url (gets injected into your landing page) 
----
-stylizedcassetteplayer.html

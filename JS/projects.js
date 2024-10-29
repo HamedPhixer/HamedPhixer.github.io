@@ -71,43 +71,55 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = await response.text();
             const mediaContainer = document.getElementById('project-media');
             const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
-
+    
             const basePath = window.location.pathname.split('/').slice(0, -1).join('/') + '/';
             const fragment = document.createDocumentFragment();
-
+    
             let i = 0;
             while (i < lines.length) {
                 let description = '';
                 let urls = [lines[i]];
-
+    
                 // Check if the next line is a description
-                if (i + 1 < lines.length && !lines[i + 1].match(/\.(jpeg|jpg|gif|png|mp4|webm|mview)$/) && !lines[i + 1].includes('youtube.com') && !lines[i + 1].includes('sketchfab.com') && !lines[i + 1].includes(' // ')) {
+                if (i + 1 < lines.length && !lines[i + 1].match(/\.(jpeg|jpg|gif|png|mp4|webm|mview)$/) && !lines[i + 1].includes('youtube.com') && !lines[i + 1].includes('sketchfab.com') && !lines[i + 1].includes(' // ') && !lines[i + 1].includes('||')) {
                     description = lines[i + 1];
                     i += 1;
                 }
-
-                // Check if the line contains a pair of images
+    
+                // Check if the line contains images for a comparison slider (using `//`)
                 if (lines[i].includes(' // ')) {
                     urls = lines[i].split(' // ').map(url => url.trim());
+                    const mediaElement = createComparisonSliderElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
                 }
-
-                // Adjust URLs for relative paths
-                urls = urls.map(url => (url.startsWith('http') ? url : basePath + url));
-
-                if (description.includes('(marmoset viewer)')) {
-                    urls = [`${urls[0]}.mview`];
+                // Check if the line contains multiple images in a row (using `||`)
+                else if (lines[i].includes('||')) {
+                    urls = lines[i].split('||').map(url => url.trim());
+                    const mediaElement = createImageRowElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
+                } 
+                else {
+                    // Adjust URLs for relative paths
+                    urls = urls.map(url => (url.startsWith('http') ? url : basePath + url));
+    
+                    if (description.includes('(marmoset viewer)')) {
+                        urls = [`${urls[0]}.mview`];
+                    }
+    
+                    // Create media elements for single images, videos, YouTube, Sketchfab, etc.
+                    const mediaElement = createMediaElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
                 }
-
-                const mediaElement = createMediaElement(urls, description);
-                if (mediaElement) fragment.appendChild(mediaElement);
+    
                 i += 1;
             }
-
+    
             mediaContainer.appendChild(fragment);
         } catch (error) {
             console.error('Error loading project media:', error);
         }
     };
+    
 
     const createMarmosetViewerElement = (url) => {
         const mediaElement = document.createElement('div');
@@ -126,8 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const createMediaElement = (urls, description) => {
         let mediaElement;
 
-        if (urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
-            mediaElement = createImageElement(urls);
+        if (urls.length > 1 && urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
+            // If there are multiple URLs, and they're images, create a multi-image row
+            mediaElement = createImageRowElement(urls);
+        } else if (urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
+            mediaElement = createSingleImageElement(urls[0]);
         } else if (urls[0].match(/\.(mp4|webm)$/) != null) {
             mediaElement = createVideoElement(urls[0]);
         } else if (urls[0].includes('youtube.com')) {
@@ -148,7 +163,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return mediaElement;
     };
 
-    const createImageElement = (urls) => {
+    const createImageRowElement = (urls) => {
+        const mediaElement = document.createElement('div');
+        mediaElement.className = 'media-item image-row';
+    
+        // Calculate the appropriate width for each image
+        const imageWidth = (100 / urls.length) - 2; // Subtract to account for gap
+    
+        urls.forEach(url => {
+            const imgElement = document.createElement('img');
+            imgElement.src = url;
+            imgElement.alt = 'Project Image';
+            imgElement.className = 'row-image';
+            imgElement.style.width = `${imageWidth}%`; // Set each image width based on the number of images
+            mediaElement.appendChild(imgElement);
+        });
+    
+        return mediaElement;
+    };
+    
+    const createSingleImageElement = (url) => {
+        const mediaElement = document.createElement('div');
+        mediaElement.className = 'media-item';
+    
+        const imgElement = document.createElement('img');
+        imgElement.src = url;
+        imgElement.alt = 'Project Image';
+        mediaElement.appendChild(imgElement);
+    
+        return mediaElement;
+    };
+    
+        // Function to create a comparison slider element
+    const createComparisonSliderElement = (urls) => {
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item';
 

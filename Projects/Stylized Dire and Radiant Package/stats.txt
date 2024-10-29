@@ -1,0 +1,13 @@
+Triangles: 
+
+Materials: 
+
+Texture Size: 1k and 2k
+
+Texel Density: 
+
+Workflow: UE landscape tools
+
+Target Engine: Unreal Engine
+
+Collaborators:

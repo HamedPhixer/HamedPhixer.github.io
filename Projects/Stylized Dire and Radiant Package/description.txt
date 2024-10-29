@@ -1,0 +1,11 @@
+Stylized Dire and Radiant Package
+---
+This package is available on Fab: https://www.fab.com/listings/9eb2b7b9-8335-44bb-b85e-789bb84bcdf3
+-
+Created in Unreal Engine 5, this stylized environment asset pack is designed with inspiration from Dota 2 and popular modern games, offering a blend of top-down and third-person perspective styles. With 48 unique meshes, customizable shaders, and support for Runtime Virtual Texture (RVT), users have the flexibility to craft a visually rich and personalized setting. This pack includes custom collision, LODs, 7 materials, 4 VFX materials, and a broad collection of textures in 1k and 2k resolutions, making it perfect for immersive, stylized worlds.
+---
+Blender, Zbrush, Substance Painter, UE5
+---
+thumbnail url (gets injected into your landing page) 
+---
+stylizeddireandradiant.html

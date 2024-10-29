@@ -220,6 +220,23 @@ hr {
   padding: 5px;
 }  
 
+.image-row {
+  display: flex;
+  gap: 2px; /* Space between images */
+  width: 100%;
+  justify-content: space-evenly; /* Ensure even spacing */
+  align-items: center; /* Vertically center the images */
+}
+
+.row-image {
+  flex: 1 1 0;  /* Allow images to grow and shrink to fit available space */
+  max-width: calc(100% / var(--image-count) - 10px); /* Divide space based on image count */
+  height: auto;
+  object-fit: contain; /* Ensure the image fits without being distorted */
+}
+
+
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .container {
