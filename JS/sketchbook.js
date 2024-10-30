@@ -1,20 +1,15 @@
 // Function to create a thumbnail that opens the image directly in full size
 function createSketchbookThumbnail(src, alt) {
-    const thumbnailLink = document.createElement("a");
-    thumbnailLink.href = src; // Direct link to the full-sized image
-    thumbnailLink.target = "_blank"; // Open in a new tab
-
     const thumbnailDiv = document.createElement("div");
     thumbnailDiv.classList.add("thumbnail");
 
     const thumbnailImg = document.createElement("img");
-    thumbnailImg.src = src; // Thumbnail image (or use a smaller image if available)
+    thumbnailImg.src = src;
     thumbnailImg.alt = alt;
 
     thumbnailDiv.appendChild(thumbnailImg);
-    thumbnailLink.appendChild(thumbnailDiv);
-
-    return thumbnailLink;
+    thumbnailDiv.onclick = () => openModal(src); // Use openModal on click
+    return thumbnailDiv;
 }
 
 // Get the thumbnail container element
@@ -43,3 +38,22 @@ fetchSketchbookImages().then(imageUrls => {
     // Append the fragment to the container once all thumbnails are created
     thumbnailContainer.appendChild(fragment);
 });
+
+function openModal(src) {
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modal-image');
+    modal.style.display = 'flex';
+    modalImg.src = src;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.style.display = 'none';
+    modal.classList.add('modal-overlay');
+    modal.innerHTML = `<div class="modal-content"><img id="modal-image" src="" /></div>`;
+    document.body.appendChild(modal);
+
+    modal.onclick = () => (modal.style.display = 'none');
+});
+
