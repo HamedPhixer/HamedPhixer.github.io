@@ -1,91 +1,96 @@
-/* Style for the image container */
 .img-container {
-    position: relative;
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-  }
-  
-  /* Style for the images */
-  .img-container img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  .img-container .image-2 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    clip-path: inset(0 0 0 50%); /* Start with the secondary image hidden */
-  }
+  position: relative;
+  display: flex;
+  width: 100%; /* Full width */
+  max-width: 100%; /* Remove any maximum width restrictions */
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto; /* Allow right-click on images */
+}
 
-/* Style for the slider container */
+
+.img-container img {
+  width: 100%; /* Full width for images in img-container */
+  height: auto;
+}
+
+/* Secondary (overlay) image styling */
+.img-container .image-2 {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  height: auto;
+  transform: translateX(-50%);
+  clip-path: inset(0 50% 0 0);
+  /* transition: clip-path 0.3s ease; /* Smooth transition for slider */
+  
+}
+
+/* Slider container should be relative to the image */
 .slider-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Ensure the slider container does not interfere with image clicks */
-  }
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%; /* Matches the image width */
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  margin: 0;
+  overflow: hidden
   
-  /* Style for the slider line */
-  .slider-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 2px;
-    background: rgba(255, 255, 255, 0.7);
-    z-index: 3; /* Between the images and the slider thumb */
-    transform: translateX(-50%);
-    pointer-events: none;
-  }
-  
-  /* Style for the image slider */
-  .image-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    position: absolute;
-    z-index: 4; /* Higher than the slider line */
-    top: 50%;
-    width: 100%;
-    background: transparent;
-    outline: none;
-    cursor: pointer;
-    pointer-events: all; /* Allow the slider thumb to be clickable */
-  }
-  
-  .image-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 8px;
-    height: 50px;
-    background: #ffffff;
-    cursor: grab;
-    border-radius: 1em;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-    transition: background 0.3s;
-    z-index: 4; /* Ensure thumb is on top */
-  }
-  
-  .image-slider::-moz-range-thumb {
-    width: 7px;
-    height: 50px;
-    background: #ffffff;
-    cursor: pointer;
-    border-radius: 1em;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-    transition: background 0.3s;
-    z-index: 4; /* Ensure thumb is on top */
-  }
-  
-  .image-slider::-webkit-slider-thumb:hover {
-    background: #dddddd;
-  }
-  
-  .image-slider::-moz-range-thumb:hover {
-    background: #dddddd;
-  }
+}
+
+/* Remove the slider thumb and make the image draggable */
+.image-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* Ensure slider stays within image */
+  max-width: 100%; /* Limit to image width */
+  height: 100%;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  z-index: 5;
+  pointer-events: all;
+}
+
+/* Updated Slider Line Styling */
+.slider-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px; /* Make it a bit more visible */
+  background: rgba(255, 255, 255, 0.7);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+
+.image-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0px;
+  height: 60px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+}
+
+.image-slider::-moz-range-thumb {
+  width: 0px;
+  height: 60px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+}

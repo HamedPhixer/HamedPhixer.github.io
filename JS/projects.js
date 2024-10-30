@@ -171,15 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item image-row';
     
-        // Calculate the appropriate width for each image
-        const imageWidth = (100 / urls.length) - 2; // Subtract to account for gap
+        const imageWidth = (100 / urls.length) - 2;
     
         urls.forEach(url => {
             const imgElement = document.createElement('img');
             imgElement.src = url;
             imgElement.alt = 'Project Image';
             imgElement.className = 'row-image';
-            imgElement.style.width = `${imageWidth}%`; // Set each image width based on the number of images
+            imgElement.style.width = `${imageWidth}%`;
+            imgElement.onclick = () => openModal(url); // Set onclick to open modal
             mediaElement.appendChild(imgElement);
         });
     
@@ -189,11 +189,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const descElement = document.createElement('p');
             descElement.className = 'media-description';
             descElement.textContent = description;
-            container.appendChild(descElement); // Add description below the row
+            container.appendChild(descElement);
         }
     
         return container;
-    };    
+    };
+    
+    const openModal = (src) => {
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modal-image');
+        modal.style.display = 'flex';
+        modalImg.src = src;
+    };
+    
+    // Close modal when clicking outside the image or pressing Escape
+    document.getElementById('modal').onclick = () => {
+        document.getElementById('modal').style.display = 'none';
+    };
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') document.getElementById('modal').style.display = 'none';
+    });    
     
     
     const createSingleImageElement = (url) => {
@@ -208,67 +223,98 @@ document.addEventListener('DOMContentLoaded', () => {
         return mediaElement;
     };
     
-    // Function to create a comparison slider element
+    // Adjusting the comparison slider based on viewport and slider position
     const createComparisonSliderElement = (urls, description) => {
-        const container = document.createElement('div'); // New container for slider and description
+        const container = document.createElement('div');
         container.className = 'media-item';
-    
+
         const imgContainer = document.createElement('div');
         imgContainer.className = 'img-container';
-    
+
         const imgElement1 = document.createElement('img');
-        imgElement1.src = urls[0];
+        imgElement1.src = urls[1];
         imgElement1.className = 'image-1';
-        imgElement1.alt = 'Primary image';
         imgContainer.appendChild(imgElement1);
-    
-        if (urls[1]) {
-            const imgElement2 = document.createElement('img');
-            imgElement2.src = urls[1];
-            imgElement2.className = 'image-2';
-            imgElement2.alt = 'Secondary image';
-            imgContainer.appendChild(imgElement2);
-    
-            const sliderContainer = document.createElement('div');
-            sliderContainer.className = 'slider-container';
-    
-            const sliderLine = document.createElement('div');
-            sliderLine.className = 'slider-line';
-    
-            const slider = document.createElement('input');
-            slider.type = 'range';
-            slider.min = '0';
-            slider.max = '100';
-            slider.value = '50';
-            slider.className = 'image-slider';
-            slider.setAttribute('aria-label', 'Image comparison slider');
-            slider.addEventListener('input', () => {
-                const value = slider.value;
-                imgElement2.style.clipPath = `inset(0 0 0 ${value}%)`;
-                sliderLine.style.left = `calc(${value}% - 1px)`; // Ensure the line is aligned with the thumb
-            });
-    
-            sliderContainer.appendChild(sliderLine);
-            sliderContainer.appendChild(slider);
-    
-            container.appendChild(imgContainer);
-            container.appendChild(sliderContainer);
-        } else {
-            container.appendChild(imgContainer);
-        }
-    
-        // Add description below the slider, if provided
+
+        const imgElement2 = document.createElement('img');
+        imgElement2.src = urls[0];
+        imgElement2.className = 'image-2';
+        imgContainer.appendChild(imgElement2);
+
+        const sliderContainer = document.createElement('div');
+        sliderContainer.className = 'slider-container';
+
+        const sliderLine = document.createElement('div');
+        sliderLine.className = 'slider-line';
+        sliderContainer.appendChild(sliderLine);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '100';
+        slider.value = '50';
+        slider.className = 'image-slider';
+        slider.setAttribute('aria-label', 'Image comparison slider');
+        sliderContainer.appendChild(slider);
+
+        // Update clipping and slider line position on input
+        const updateSliderPosition = (value) => {
+            // Update the overlay image's clipping to match the slider position
+            imgElement2.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
+        
+            // Adjust the white slider line to match the current slider value
+            sliderLine.style.left = `${value}%`;
+        };
+        
+        
+        slider.addEventListener('input', () => {
+            const value = slider.value;
+            updateSliderPosition(value);
+        });
+        
+        imgContainer.addEventListener('mousedown', (event) => {
+            if (event.button !== 0) return;
+        
+            const onMouseMove = (moveEvent) => {
+                const rect = imgContainer.getBoundingClientRect();
+                const offsetX = moveEvent.clientX - rect.left;
+        
+                // Calculate the percentage value based on the mouse position relative to the container
+                let percentage = (offsetX / rect.width) * 100;
+        
+                // Ensure the percentage is between 0 and 100
+                percentage = Math.max(0, Math.min(100, percentage));
+        
+                // Update the slider value and the positions
+                slider.value = percentage;
+                updateSliderPosition(percentage);
+            };
+        
+            // Add mousemove event to track dragging and update slider
+            document.addEventListener('mousemove', onMouseMove);
+        
+            // Remove the mousemove event once the user releases the mouse button
+            document.addEventListener('mouseup', () => {
+                document.removeEventListener('mousemove', onMouseMove);
+            }, { once: true });
+            
+        });
+        
+        imgContainer.appendChild(sliderContainer);
+        container.appendChild(imgContainer);
+
+        // Add description if provided
         if (description) {
             const descElement = document.createElement('p');
             descElement.className = 'media-description';
             descElement.textContent = description;
-            container.appendChild(descElement); // Add description below the slider
+            container.appendChild(descElement);
         }
-    
+
         return container;
     };
-    
 
+    
     const createVideoElement = (url) => {
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item';
@@ -480,3 +526,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
+

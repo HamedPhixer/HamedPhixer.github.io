@@ -6,6 +6,6 @@ Created in Unreal Engine 5, this stylized environment asset pack is designed wit
 ---
 Blender, Zbrush, Substance Painter, UE5
 ---
-thumbnail url (gets injected into your landing page) 
+https://i.postimg.cc/W1VtzzRP/Thumbnail02.jpg
 ---
 stylizeddireandradiant.html
