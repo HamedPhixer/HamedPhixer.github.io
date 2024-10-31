@@ -166,7 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const createImageRowElement = (urls, description) => {
         const container = document.createElement('div');
-        container.className = 'media-item image-row';
+        container.className = 'media-item';
+    
+        const rowContainer = document.createElement('div');
+        rowContainer.className = 'image-row';
+        container.appendChild(rowContainer);
     
         const promises = urls.map(url => {
             return new Promise((resolve) => {
@@ -184,12 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgElement.src = image.url;
                 imgElement.alt = 'Project Image';
                 imgElement.className = 'row-image';
-                imgElement.style.width = `${(image.aspectRatio / totalAspectRatio) * 100}%`; // Set width proportionally to fit container
-                imgElement.style.flexGrow = image.aspectRatio;
+                imgElement.style.width = `${(image.aspectRatio / totalAspectRatio) * 100}%`;
                 imgElement.onclick = () => openModal(image.url);
-                container.appendChild(imgElement);
+                rowContainer.appendChild(imgElement);
             });
     
+            // Add description below the row after all images are appended
             if (description) {
                 const descElement = document.createElement('p');
                 descElement.className = 'media-description';

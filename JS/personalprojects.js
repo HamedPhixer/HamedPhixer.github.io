@@ -71,43 +71,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = await response.text();
             const mediaContainer = document.getElementById('project-media');
             const lines = text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
-
-            const basePath = window.location.pathname.split('/').slice(0, -1).join('/') + '/';
+    
             const fragment = document.createDocumentFragment();
-
             let i = 0;
+    
             while (i < lines.length) {
+                let urls = [];
                 let description = '';
-                let urls = [lines[i]];
-
-                // Check if the next line is a description
-                if (i + 1 < lines.length && !lines[i + 1].match(/\.(jpeg|jpg|gif|png|mp4|webm|mview)$/) && !lines[i + 1].includes('youtube.com') && !lines[i + 1].includes('sketchfab.com') && !lines[i + 1].includes(' // ')) {
-                    description = lines[i + 1];
-                    i += 1;
-                }
-
-                // Check if the line contains a pair of images
+    
+                // Determine if the line is a comparison slider (//), side-by-side row (||), or single media item
                 if (lines[i].includes(' // ')) {
                     urls = lines[i].split(' // ').map(url => url.trim());
+                    // Handle description for `//` case
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
+                    }
+                    const mediaElement = createComparisonSliderElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
+    
+                } else if (lines[i].includes('||')) {
+                    urls = lines[i].split('||').map(url => url.trim());
+                    // Handle description for `||` case
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
+                    }
+                    const mediaElement = createImageRowElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
+    
+                } else {
+                    // Single media case
+                    urls = [lines[i].trim()];
+                    // Handle description for a single URL
+                    if (i + 1 < lines.length && !lines[i + 1].includes('http') && !lines[i + 1].includes('||') && !lines[i + 1].includes('//')) {
+                        description = lines[i + 1];
+                        i += 1; // Skip the description line
+                    }
+                    const mediaElement = createMediaElement(urls, description);
+                    if (mediaElement) fragment.appendChild(mediaElement);
                 }
-
-                // Adjust URLs for relative paths
-                urls = urls.map(url => (url.startsWith('http') ? url : basePath + url));
-
-                if (description.includes('(marmoset viewer)')) {
-                    urls = [`${urls[0]}.mview`];
-                }
-
-                const mediaElement = createMediaElement(urls, description);
-                if (mediaElement) fragment.appendChild(mediaElement);
+    
                 i += 1;
             }
-
+    
             mediaContainer.appendChild(fragment);
         } catch (error) {
             console.error('Error loading project media:', error);
         }
     };
+    
 
     const createMarmosetViewerElement = (url) => {
         const mediaElement = document.createElement('div');
@@ -126,8 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const createMediaElement = (urls, description) => {
         let mediaElement;
 
-        if (urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
-            mediaElement = createImageElement(urls);
+        if (urls.length > 1 && urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
+            // If there are multiple URLs, and they're images, create a multi-image row
+            mediaElement = createImageRowElement(urls);
+        } else if (urls[0].match(/\.(jpeg|jpg|gif|png)$/) != null) {
+            mediaElement = createSingleImageElement(urls[0]);
         } else if (urls[0].match(/\.(mp4|webm)$/) != null) {
             mediaElement = createVideoElement(urls[0]);
         } else if (urls[0].includes('youtube.com')) {
@@ -148,57 +164,188 @@ document.addEventListener('DOMContentLoaded', () => {
         return mediaElement;
     };
 
-    const createImageElement = (urls) => {
+    const createImageRowElement = (urls, description) => {
+        const container = document.createElement('div');
+        container.className = 'media-item';
+    
+        const rowContainer = document.createElement('div');
+        rowContainer.className = 'image-row';
+        container.appendChild(rowContainer);
+    
+        const promises = urls.map(url => {
+            return new Promise((resolve) => {
+                const imgElement = new Image();
+                imgElement.src = url;
+                imgElement.onload = () => resolve({ url, aspectRatio: imgElement.width / imgElement.height });
+            });
+        });
+    
+        Promise.all(promises).then(images => {
+            const totalAspectRatio = images.reduce((sum, img) => sum + img.aspectRatio, 0);
+    
+            images.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = image.url;
+                imgElement.alt = 'Project Image';
+                imgElement.className = 'row-image';
+                imgElement.style.width = `${(image.aspectRatio / totalAspectRatio) * 100}%`;
+                imgElement.onclick = () => openModal(image.url);
+                rowContainer.appendChild(imgElement);
+            });
+    
+            // Add description below the row after all images are appended
+            if (description) {
+                const descElement = document.createElement('p');
+                descElement.className = 'media-description';
+                descElement.textContent = description;
+                container.appendChild(descElement);
+            }
+        });
+    
+        return container;
+    };
+    
+    
+    const openModal = (src) => {
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modal-image');
+        modal.style.display = 'flex';
+        modalImg.src = src;
+    };
+    
+    // Close modal when clicking outside the image or pressing Escape
+    document.getElementById('modal').onclick = () => {
+        document.getElementById('modal').style.display = 'none';
+    };
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') document.getElementById('modal').style.display = 'none';
+    });    
+    
+    
+    const createSingleImageElement = (url) => {
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item';
+    
+        const imgElement = document.createElement('img');
+        imgElement.src = url;
+        imgElement.alt = 'Project Image';
+        mediaElement.appendChild(imgElement);
+    
+        return mediaElement;
+    };
+    
+    // Adjusting the comparison slider based on viewport and slider position
+    const createComparisonSliderElement = (urls, description) => {
+        const container = document.createElement('div');
+        container.className = 'media-item';
 
         const imgContainer = document.createElement('div');
         imgContainer.className = 'img-container';
 
         const imgElement1 = document.createElement('img');
-        imgElement1.src = urls[0];
+        imgElement1.src = urls[1];
         imgElement1.className = 'image-1';
-        imgElement1.alt = 'Primary image';
         imgContainer.appendChild(imgElement1);
 
-        if (urls[1]) {
-            const imgElement2 = document.createElement('img');
-            imgElement2.src = urls[1];
-            imgElement2.className = 'image-2';
-            imgElement2.alt = 'Secondary image';
-            imgContainer.appendChild(imgElement2);
+        const imgElement2 = document.createElement('img');
+        imgElement2.src = urls[0];
+        imgElement2.className = 'image-2';
+        imgContainer.appendChild(imgElement2);
 
-            const sliderContainer = document.createElement('div');
-            sliderContainer.className = 'slider-container';
+        const sliderContainer = document.createElement('div');
+        sliderContainer.className = 'slider-container';
 
-            const sliderLine = document.createElement('div');
-            sliderLine.className = 'slider-line';
+        const sliderLine = document.createElement('div');
+        sliderLine.className = 'slider-line';
+        sliderContainer.appendChild(sliderLine);
 
-            const slider = document.createElement('input');
-            slider.type = 'range';
-            slider.min = '0';
-            slider.max = '100';
-            slider.value = '50';
-            slider.className = 'image-slider';
-            slider.setAttribute('aria-label', 'Image comparison slider');
-            slider.addEventListener('input', () => {
-                const value = slider.value;
-                imgElement2.style.clipPath = `inset(0 0 0 ${value}%)`;
-                sliderLine.style.left = `calc(${value}% - 1px)`; // Ensure the line is aligned with the thumb
-            });
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '0';
+        slider.max = '100';
+        slider.value = '50';
+        slider.className = 'image-slider';
+        slider.setAttribute('aria-label', 'Image comparison slider');
+        sliderContainer.appendChild(slider);
 
-            sliderContainer.appendChild(sliderLine);
-            sliderContainer.appendChild(slider);
+        // Update clipping and slider line position on input
+        const updateSliderPosition = (value) => {
+            // Update the overlay image's clipping to match the slider position
+            imgElement2.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
+        
+            // Adjust the white slider line to match the current slider value
+            sliderLine.style.left = `${value}%`;
+        };
+        
+        
+        slider.addEventListener('input', () => {
+            const value = slider.value;
+            updateSliderPosition(value);
+        });
+        
+        imgContainer.addEventListener('mousedown', (event) => {
+            if (event.button !== 0) return;
+        
+            const onMouseMove = (moveEvent) => {
+                const rect = imgContainer.getBoundingClientRect();
+                const offsetX = moveEvent.clientX - rect.left;
+        
+                // Calculate the percentage value based on the mouse position relative to the container
+                let percentage = (offsetX / rect.width) * 100;
+        
+                // Ensure the percentage is between 0 and 100
+                percentage = Math.max(0, Math.min(100, percentage));
+        
+                // Update the slider value and the positions
+                slider.value = percentage;
+                updateSliderPosition(percentage);
+            };
+        
+            // Add mousemove event to track dragging and update slider
+            document.addEventListener('mousemove', onMouseMove);
+        
+            // Remove the mousemove event once the user releases the mouse button
+            document.addEventListener('mouseup', () => {
+                document.removeEventListener('mousemove', onMouseMove);
+            }, { once: true });
+            
+        });
 
-            mediaElement.appendChild(imgContainer);
-            mediaElement.appendChild(sliderContainer);
-        } else {
-            mediaElement.appendChild(imgContainer);
+        // Touch events to support dragging on mobile
+        imgContainer.addEventListener('touchstart', (event) => {
+            const onTouchMove = (touchEvent) => {
+                const rect = imgContainer.getBoundingClientRect();
+                const offsetX = touchEvent.touches[0].clientX - rect.left;
+
+                let percentage = (offsetX / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+
+                slider.value = percentage;
+                updateSliderPosition(percentage);
+            };
+
+            document.addEventListener('touchmove', onTouchMove);
+
+            document.addEventListener('touchend', () => {
+                document.removeEventListener('touchmove', onTouchMove);
+            }, { once: true });
+        });
+        
+        imgContainer.appendChild(sliderContainer);
+        container.appendChild(imgContainer);
+
+        // Add description if provided
+        if (description) {
+            const descElement = document.createElement('p');
+            descElement.className = 'media-description';
+            descElement.textContent = description;
+            container.appendChild(descElement);
         }
 
-        return mediaElement;
+        return container;
     };
 
+    
     const createVideoElement = (url) => {
         const mediaElement = document.createElement('div');
         mediaElement.className = 'media-item';
@@ -386,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keyboard navigation
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
-            window.location.href = '../../personalworks.html';
+            window.location.href = '../../personalindex.html';
         } else if (event.key === 'ArrowLeft') {
             navigateProjects(-1);
         } else if (event.key === 'ArrowRight') {
@@ -410,3 +557,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     init();
 });
+

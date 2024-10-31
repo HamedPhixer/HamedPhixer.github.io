@@ -137,11 +137,14 @@ h3 {
 }
 
 .media-description {
+  margin-top: 1px; /* Space between image row and description */
   margin-bottom: 10px;
   color: grey;
   font-size: 14px;
-  text-align: center;
+  text-align: center; /* Center-align the description text */
+  width: 100%; /* Ensure it takes full width of the container */
 }
+
 
 /* Style for the media item container */
 .media-item {
