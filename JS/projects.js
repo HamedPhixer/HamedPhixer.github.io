@@ -165,35 +165,43 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const createImageRowElement = (urls, description) => {
-        const container = document.createElement('div'); // New container for row and description
-        container.className = 'media-item';
+        const container = document.createElement('div');
+        container.className = 'media-item image-row';
     
-        const mediaElement = document.createElement('div');
-        mediaElement.className = 'media-item image-row';
-    
-        const imageWidth = (100 / urls.length) - 2;
-    
-        urls.forEach(url => {
-            const imgElement = document.createElement('img');
-            imgElement.src = url;
-            imgElement.alt = 'Project Image';
-            imgElement.className = 'row-image';
-            imgElement.style.width = `${imageWidth}%`;
-            imgElement.onclick = () => openModal(url); // Set onclick to open modal
-            mediaElement.appendChild(imgElement);
+        const promises = urls.map(url => {
+            return new Promise((resolve) => {
+                const imgElement = new Image();
+                imgElement.src = url;
+                imgElement.onload = () => resolve({ url, aspectRatio: imgElement.width / imgElement.height });
+            });
         });
     
-        container.appendChild(mediaElement);
+        Promise.all(promises).then(images => {
+            const totalAspectRatio = images.reduce((sum, img) => sum + img.aspectRatio, 0);
     
-        if (description) {
-            const descElement = document.createElement('p');
-            descElement.className = 'media-description';
-            descElement.textContent = description;
-            container.appendChild(descElement);
-        }
+            images.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = image.url;
+                imgElement.alt = 'Project Image';
+                imgElement.className = 'row-image';
+                imgElement.style.width = `${(image.aspectRatio / totalAspectRatio) * 100}%`; // Set width proportionally to fit container
+                imgElement.style.flexGrow = image.aspectRatio;
+                imgElement.onclick = () => openModal(image.url);
+                container.appendChild(imgElement);
+            });
+    
+            if (description) {
+                const descElement = document.createElement('p');
+                descElement.className = 'media-description';
+                descElement.textContent = description;
+                container.appendChild(descElement);
+            }
+        });
     
         return container;
     };
+    
+    
     
     const openModal = (src) => {
         const modal = document.getElementById('modal');
@@ -298,6 +306,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.removeEventListener('mousemove', onMouseMove);
             }, { once: true });
             
+        });
+
+        // Touch events to support dragging on mobile
+        imgContainer.addEventListener('touchstart', (event) => {
+            const onTouchMove = (touchEvent) => {
+                const rect = imgContainer.getBoundingClientRect();
+                const offsetX = touchEvent.touches[0].clientX - rect.left;
+
+                let percentage = (offsetX / rect.width) * 100;
+                percentage = Math.max(0, Math.min(100, percentage));
+
+                slider.value = percentage;
+                updateSliderPosition(percentage);
+            };
+
+            document.addEventListener('touchmove', onTouchMove);
+
+            document.addEventListener('touchend', () => {
+                document.removeEventListener('touchmove', onTouchMove);
+            }, { once: true });
         });
         
         imgContainer.appendChild(sliderContainer);

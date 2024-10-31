@@ -222,19 +222,25 @@ hr {
 .image-row {
   display: flex;
   gap: 2px; /* Space between images */
-  width: 100%;
-  justify-content: space-evenly; /* Ensure even spacing */
-  align-items: center; /* Vertically center the images */
+  width: 100%; /* Match the width of the parent container */
+  align-items: center; /* Center images vertically */
+  overflow: hidden; /* Prevent any overflow from the container */
+  flex-wrap: nowrap; /* Ensure all images remain in one row */
+  justify-content: flex-start; /* Align images to start */
 }
 
+
 .row-image {
-  flex: 1 1 0;  /* Allow images to grow and shrink to fit available space */
-  max-width: calc(100% / var(--image-count) - 10px); /* Divide space based on image count */
   height: auto;
-  object-fit: contain; /* Ensure the image fits without being distorted */
-  transition: transform 0.3s, filter 0.3s; /* Smooth effect for transformation and filter */
-  cursor: pointer; /* Show pointer cursor to indicate clickable */
+  object-fit: cover; /* Cover the allocated area but do not overflow */
+  transition: transform 0.3s, filter 0.3s;
+  cursor: pointer;
+  flex-grow: 1; /* Allow images to grow based on their aspect ratio */
+  max-width: 100%; /* Make sure no image exceeds the container width */
+  box-sizing: border-box; /* Include padding/border in width calculation */
 }
+
+
 
 .row-image:hover {
   transform: scale(1.02); /* Slightly increase the size to emphasize interactivity */
