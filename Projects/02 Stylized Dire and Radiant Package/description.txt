@@ -1,0 +1,19 @@
+Stylized Dire and Radiant Package
+---
+This package is available on Fab:
+https://www.fab.com/listings/9eb2b7b9-8335-44bb-b85e-789bb84bcdf3
+--
+I created this environment with various references in mind, including my primary source of inspiration, Dota 2, as well as the many stylized environments found in modern games. I aimed to achieve a balance between top-down and third-person perspectives. The journey to completion was arduous, but I am thrilled with the final result.
+--
+-Number of Unique Meshes: 48
+-Collision: (Yes, custom)
+-LODs: (Yes, Auto)
+-Number of Materials and Material Instances: 7 Material, 4 VFX Material, 84 Instance Material, 37 Material Instance for Demo (mostly use RVT)
+-Number of Textures: 76
+-Texture Resolutions: 1k and 2k
+---
+Blender, Zbrush, Substance Painter, UE5
+---
+https://i.postimg.cc/W1VtzzRP/Thumbnail02.jpg
+---
+stylizeddireandradiant.html

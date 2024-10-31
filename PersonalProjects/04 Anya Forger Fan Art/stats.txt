@@ -1,0 +1,13 @@
+Triangles: Decimated Highpoly (not a game asset)
+
+Materials: 
+
+Texture Size: 
+
+Texel Density: 
+
+Workflow: Zbrush to Substance
+
+Target Engine: 
+
+Collaborators:

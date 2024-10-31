@@ -132,6 +132,7 @@ h3 {
   color: grey;
   font-family: 'Poppins', sans-serif;
   font-weight: 400;
+  white-space: pre-wrap; /* Preserves line breaks and spaces */
   -webkit-user-select: none; /* Standard property */
   user-select: none; /* Safari and iOS support */
 }

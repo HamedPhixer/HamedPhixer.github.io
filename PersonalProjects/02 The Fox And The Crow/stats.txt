@@ -6,7 +6,7 @@ Texture Size:
 
 Texel Density: 
 
-Workflow: 
+Workflow: 2D to 3D (live wallpaper)
 
 Target Engine:
 

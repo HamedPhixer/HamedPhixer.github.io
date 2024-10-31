@@ -6,7 +6,7 @@ Texture Size:
 
 Texel Density: 
 
-Workflow: 
+Workflow: PBR
 
 Target Engine: Unreal Engin
 

@@ -1,0 +1,24 @@
+Stylized Middle Eastern Weapons
+---
+This package is available on Fab:
+https://www.fab.com/listings/70e39b47-998e-429f-970c-3254c358430a
+--
+The main point of this project was to add some old Persian and Middle Eastern patterns to my weapons and designs. I wanted to get some influence from my country's culture. I designed and made for both portfolio and market. All weapons have 2 UVs for some basic base color customizations. With a 16x grid mask, the second UV, and material layers, users can change hue and value, or add overlay color on different parts of the asset. For example, you can change the color of only the wood part of the one-handed axe but this method is not like an ID map so it's impossible to customize details that do not have separate UVs.
+--
+-One Handed Axe - 8k tris - 1 texture set
+-Two Sided Axe - 6k Tris - 1 Texture set
+-Halberd - 6k Tris - 1 Texture set
+-Shield - 5k tris - 2 texture sets (front and back)
+-Sword and Scabbard - 6k Tris - 2 Texture sets (1sword - 1scabbard)
+-Dagger and Scabbard - 3.5k Tris - 1 Texture set
+-Spear - 2k Tris - 1 Texture set
+-Bow - 9k Tris - 1 Texture set
+-Quiver and Arrow - 2k and 1k - 1 Texture set each
+-2x Mace 2x Flail - 5k to 10k Tris - 2 Texture sets (heads and shafts)
+-2x Staff - 2k to 4k Tris - 1 Texture set each
+---
+Blender, Zbrush, Substance Painter, UE5
+---
+https://i.postimg.cc/hvN9Q35f/Thumbnail.png
+---
+stylizedmiddleeasternweapons.html

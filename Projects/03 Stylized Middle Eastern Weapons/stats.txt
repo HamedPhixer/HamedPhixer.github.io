@@ -6,8 +6,8 @@ Texture Size: 1k and 2k
 
 Texel Density: 
 
-Workflow: UE landscape tools
+Workflow: PBR
 
 Target Engine: Unreal Engine
 
-Collaborators:
+Collaborators: Pouya Abdollahi
