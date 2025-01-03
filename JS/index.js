@@ -97,23 +97,26 @@ function fetchProjects() {
 // Fetch projects and create thumbnails
 fetchProjects().then(projects => {
     let bannerImageSet = false;
-    const fragment = document.createDocumentFragment(); // Create a document fragment
 
-    const fetchProjectDataPromises = projects.map(projectName => {
-        return fetchProjectData(projectName).then(artwork => {
+    // Fetch project data for all projects
+    const fetchProjectDataPromises = projects.map(projectName => fetchProjectData(projectName));
+
+    Promise.all(fetchProjectDataPromises).then(projectDataArray => {
+        // Preserve the order from `personalprojects.txt`
+        const fragment = document.createDocumentFragment();
+
+        projects.forEach((projectName, index) => {
+            const artwork = projectDataArray[index];
             const thumbnail = createThumbnail(artwork.src, artwork.alt, artwork.galleryPageUrl, artwork.hasMultipleImages, artwork.hasVideo, artwork.hasYouTube, artwork.hasSketchfab);
-            fragment.appendChild(thumbnail); // Append each thumbnail to the fragment
+            fragment.appendChild(thumbnail);
 
             // Set the banner image if not already set
             if (!bannerImageSet && artwork.bannerImageUrl) {
                 document.querySelector('.top-container').style.backgroundImage = `url(${artwork.bannerImageUrl})`;
                 bannerImageSet = true;
             }
-        }).catch(error => console.error(`Error loading data for project: ${projectName}`, error));
-    });
+        });
 
-    // Once all project data has been fetched and processed, append the fragment to the container
-    Promise.all(fetchProjectDataPromises).then(() => {
         thumbnailContainer.appendChild(fragment);
-    });
+    }).catch(error => console.error('Error processing projects:', error));
 });
