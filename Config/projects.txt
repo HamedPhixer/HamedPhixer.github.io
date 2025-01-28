@@ -1,5 +1,5 @@
 
 
-03 Stylized Middle Eastern Weapons
-02 Stylized Dire and Radiant Package
-01 Stylized Cassette Player
+03StylizedMiddleEasternWeapons
+02StylizedDireandRadiantPackage
+01StylizedCassettePlayer

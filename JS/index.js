@@ -9,6 +9,7 @@ function createThumbnail(src, alt, galleryPageUrl, hasMultipleImages, hasVideo, 
     const thumbnailImg = document.createElement("img");
     thumbnailImg.src = src;
     thumbnailImg.alt = alt;
+    thumbnailImg.loading = "lazy"; // Add lazy loading attribute
 
     const thumbnailTitle = document.createElement("div");
     thumbnailTitle.classList.add("thumbnail-title");

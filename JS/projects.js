@@ -187,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imgElement = document.createElement('img');
                 imgElement.src = image.url;
                 imgElement.alt = 'Project Image';
+                imgElement.loading = 'lazy'; // Optimize loading for large images
                 imgElement.className = 'row-image';
                 imgElement.style.width = `${(image.aspectRatio / totalAspectRatio) * 100}%`;
                 imgElement.onclick = () => openModal(image.url);
@@ -230,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imgElement = document.createElement('img');
         imgElement.src = url;
         imgElement.alt = 'Project Image';
+        imgElement.loading = 'lazy'; // Optimize loading for large images
         mediaElement.appendChild(imgElement);
     
         return mediaElement;
@@ -245,11 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imgElement1 = document.createElement('img');
         imgElement1.src = urls[1];
+        imgElement1.loading = 'lazy'; // Optimize loading for large images
         imgElement1.className = 'image-1';
         imgContainer.appendChild(imgElement1);
 
         const imgElement2 = document.createElement('img');
         imgElement2.src = urls[0];
+        imgElement2.loading = 'lazy'; // Optimize loading for large images
         imgElement2.className = 'image-2';
         imgContainer.appendChild(imgElement2);
 

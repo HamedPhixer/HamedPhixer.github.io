@@ -6,6 +6,7 @@ function createSketchbookThumbnail(src, alt) {
     const thumbnailImg = document.createElement("img");
     thumbnailImg.src = src;
     thumbnailImg.alt = alt;
+    thumbnailImg.loading = "lazy"; // Add lazy loading attribute
 
     thumbnailDiv.appendChild(thumbnailImg);
     thumbnailDiv.onclick = () => openModal(src); // Use openModal on click
